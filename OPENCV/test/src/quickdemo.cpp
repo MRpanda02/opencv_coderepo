@@ -242,3 +242,138 @@ void QuickDemo::inrange_demo(Mat &image)
     image.copyTo(redback,mask);
     imshow("redback",redback);
 }
+
+void QuickDemo::pixel_statistic_demo(Mat &image)
+{
+    double minv,maxv;
+    Point minLoc,maxLoc;
+    std::vector<Mat> mv;
+    split(image,mv);
+    for(int i=0;i<mv.size();i++){
+        minMaxLoc(mv[i],&minv,&maxv,&minLoc,&maxLoc,Mat());
+        std::cout << "No channels:" << i << " min value:" << minv << " max value:" << maxv << std::endl;
+        std::cout << "MinLoc:" << minLoc << "  MaxLoc:" << maxLoc << std::endl;
+    }
+    Mat mean,stddev;
+    meanStdDev(image,mean,stddev);
+    std::cout << "means:" << mean << std::endl;
+    std::cout << "stddev:" << stddev << std::endl;
+}
+
+void QuickDemo::drawing_demo(Mat &image)
+{
+    Rect rect;
+    Mat bg = Mat::zeros(image.size(),image.type());
+    Mat dst;
+    rect.x = 200;
+    rect.y = 200;
+    rect.width = 100;
+    rect.height = 150;
+    rectangle(image,rect,Scalar(0,0,255),2,8,0);
+    circle(image,Point(300,350),15,Scalar(255,0,0),2,8,0);
+    line(image,Point(100,100),Point(350,400),Scalar(0,0,255),2,8,0);
+    RotatedRect rrt;
+    rrt.center = Point(200,200);
+    rrt.size = Size(100,200);
+    rrt.angle = 0.0;
+    ellipse(image,rrt,Scalar(0,0,255),2,8);
+    addWeighted(image,0.7,bg,0.3,0,dst);
+    namedWindow("drawing demo",WINDOW_FREERATIO);
+    imshow("drawing demo",image);
+}
+
+void QuickDemo::random_drawing(Mat &image)
+{
+    Mat canvas = Mat::zeros(Size(512,512),CV_8UC3);
+    RNG rng(12345);
+    namedWindow("canvas",WINDOW_FREERATIO);
+    while(true){
+        int c = waitKey(10);
+        if(c == 27){
+            break;
+        }
+        int x1 = rng.uniform(0,canvas.cols);
+        int y1 = rng.uniform(0,canvas.rows); 
+        int x2 = rng.uniform(0,canvas.cols);
+        int y2 = rng.uniform(0,canvas.rows); 
+        int b = rng.uniform(0,255);
+        int g = rng.uniform(0,255);
+        int r = rng.uniform(0,255);
+        canvas = Scalar(0,0,0);
+        line(canvas,Point(x1,y1),Point(x2,y2),Scalar(b,g,r),1,LINE_AA,0);
+        imshow("canvas",canvas);
+    }
+}
+
+void QuickDemo::polyline_drawing_demo(Mat &image)
+{
+    Mat canvas = Mat::zeros(Size(512,512),CV_8UC3);
+    Point p1(100,100);
+    Point p2(350,100);
+    Point p3(450,280);
+    Point p4(320,540);
+    Point p5(80,400);
+    std::vector <Point> pts;
+    pts.push_back(p1);
+    pts.push_back(p2);
+    pts.push_back(p3);
+    pts.push_back(p4);
+    pts.push_back(p5);
+    std::vector <std::vector<Point>> contours;
+    contours.push_back(pts);
+    drawContours(canvas,contours,-1,Scalar(255,0,0),-1);
+    namedWindow("polyline",WINDOW_FREERATIO);
+    imshow("polyline",canvas);
+}
+
+Point sp(-1,-1);
+Point ep(-1,-1);
+Mat temp;
+static void on_draw(int event,int x,int y,int flags,void *userdata)
+{
+    Mat image = *((Mat*)userdata);
+    if(event == EVENT_LBUTTONDOWN){
+        sp.x = x;
+        sp.y = y;
+        std::cout << "sp.x : " << sp.x << std::endl;
+    }
+    else if(event == EVENT_LBUTTONUP){
+        ep.x = x;
+        ep.y = y;
+        int dx = ep.x - sp.x;
+        int dy = ep.y - sp.y;
+        if(dx > 0 && dy > 0){
+            Rect box(sp.x,sp.y,dx,dy);
+            rectangle(image,box,Scalar(255,0,0),2,8,0);
+            namedWindow("shubiao",WINDOW_FREERATIO);
+            imshow("shubiao",image);
+            namedWindow("fenli",WINDOW_FREERATIO);
+            imshow("fenli",image(box));
+            sp.x = -1;
+            sp.y = -1;
+        }
+    }
+    else if(event == EVENT_MOUSEMOVE){
+        if(sp.x > 0 && sp.y > 0){
+            ep.x = x;
+            ep.y = y;
+            int dx = ep.x - sp.x;
+            int dy = ep.y - sp.y;
+        if(dx > 0 && dy > 0){
+            Rect box(sp.x,sp.y,dx,dy);
+            temp.copyTo(image);
+            rectangle(image,box,Scalar(255,0,0),2,8,0);
+            namedWindow("shubiao",WINDOW_FREERATIO);
+            imshow("shubiao",image);
+            //reset
+        }
+        }
+    }
+}
+void QuickDemo::mouse_drawing_demo(Mat &image)
+{
+    namedWindow("shubiao",WINDOW_FREERATIO);
+    setMouseCallback("shubiao",on_draw,(void*)(&image));
+    imshow("shubiao",image);
+    image.copyTo(temp);
+}

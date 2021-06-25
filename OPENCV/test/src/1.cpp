@@ -13,7 +13,7 @@ int main(int args,char** argv)
     }
     imshow("Src",img);
     QuickDemo qd;
-    qd.inrange_demo(img);
+    qd.mouse_drawing_demo(img);
     waitKey(0);
     destroyAllWindows();
     cout << "Hello world" << endl;
