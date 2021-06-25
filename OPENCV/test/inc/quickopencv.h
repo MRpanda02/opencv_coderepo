@@ -11,4 +11,7 @@ class QuickDemo{
     void  tracking_bar_demo(Mat &);
     void key_demo(Mat &);
     void color_style_demo(Mat &);
+    void bitwise_demo(Mat &);
+    void channels_demo(Mat &);
+    void inrange_demo(Mat &);
 };

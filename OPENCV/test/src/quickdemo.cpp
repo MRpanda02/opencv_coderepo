@@ -186,3 +186,59 @@ void QuickDemo::color_style_demo(Mat &image)
         imshow("color style",dst);
     }
 }
+
+void QuickDemo::bitwise_demo(Mat &image)
+{
+    Mat m1 = Mat::zeros(Size(256,256),CV_8UC3);
+    Mat m2 = Mat::zeros(Size(256,256),CV_8UC3);
+    Mat dst = Mat::zeros(Size(256,256),CV_8UC3);
+    rectangle(m1,Rect(100,100,80,80),Scalar(255,255,0),-1,LINE_8,0);
+    rectangle(m2,Rect(150,150,80,80),Scalar(0,255,255),-1,LINE_8,0);
+    namedWindow("m1",WINDOW_FREERATIO);
+    namedWindow("m2",WINDOW_FREERATIO);
+    namedWindow("dst",WINDOW_FREERATIO);
+    bitwise_and(m1,m2,dst);
+    imshow("m1",m1);
+    imshow("m2",m2);
+    imshow("dst",dst);
+}
+
+void QuickDemo::channels_demo(Mat &image)
+{
+    std::vector<Mat> mv;
+    split(image,mv);
+    //bgr
+    namedWindow("blue",WINDOW_FREERATIO);
+    namedWindow("green",WINDOW_FREERATIO);
+    namedWindow("red",WINDOW_FREERATIO);
+    namedWindow("merge",WINDOW_FREERATIO);
+    Mat dst;
+    //mv[0] = Scalar(0);
+    //mv[1] = Scalar(0);
+    //mv[2] = Scalar(0);
+    //merge(mv,dst);
+    dst = Mat::zeros(image.size(),CV_8UC3);
+    int from_to[] = {0,2,1,1,2,0};
+    mixChannels(&image,1,&dst,1,from_to,3); 
+    imshow("merge",dst);
+    imshow("blue",mv[0]);
+    imshow("green",mv[1]);
+    imshow("red",mv[2]);
+}
+
+void QuickDemo::inrange_demo(Mat &image)
+{
+    Mat hsv;
+    cvtColor(image,hsv,COLOR_BGR2HSV);
+    Mat mask;
+    inRange(hsv,Scalar(35,43,46),Scalar(77,255,255),mask);
+    namedWindow("mask",WINDOW_FREERATIO);
+    namedWindow("redback",WINDOW_FREERATIO);
+
+    Mat redback = Mat::zeros(image.size(),image.type());
+    redback = Scalar(40,40,200);
+    bitwise_not(mask,mask);
+    imshow("mask",mask);
+    image.copyTo(redback,mask);
+    imshow("redback",redback);
+}
