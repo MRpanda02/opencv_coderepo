@@ -11,4 +11,12 @@ class QuickDemo{
     void  tracking_bar_demo(Mat &);
     void key_demo(Mat &);
     void color_style_demo(Mat &);
+    void bitwise_demo(Mat &);
+    void channels_demo(Mat &);
+    void inrange_demo(Mat &);
+    void pixel_statistic_demo(Mat &);
+    void drawing_demo(Mat &);
+    void random_drawing(Mat &);
+    void polyline_drawing_demo(Mat &);
+    void mouse_drawing_demo(Mat &);
 };
